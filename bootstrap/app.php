@@ -12,7 +12,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->redirectGuestsTo(route('login'));
+        // Avoid generating the login URL before routes are registered
+        $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->alias([
             'admin' => EnsureUserIsAdmin::class,
         ]);

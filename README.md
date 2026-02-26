@@ -1,6 +1,6 @@
 # Comprog5-Project
 
-E-commerce / User & Product Management (Laravel + MySQL).
+**La Petite Pâtisserie: Pastry Shop** — E-commerce &amp; User Management (Laravel + MySQL).
 
 Repository: **https://github.com/dumppie/Comprog5-Project.git**
 
