@@ -12,7 +12,9 @@ use Illuminate\Http\Request;
 
 // Guest
 Route::get('/', HomeController::class)->name('home');
-Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::get('/register', function () {
+    return view('auth.register');
+})->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
