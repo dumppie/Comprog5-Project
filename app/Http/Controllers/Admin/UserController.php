@@ -34,7 +34,7 @@ class UserController extends Controller
 
         $users = $query->paginate(15)->withQueryString();
 
-        return view('admin.users.index', [
+        return view('dashboard.users', [
             'users' => $users,
             'roles' => Role::all(),
             'userStatuses' => UserStatus::all(),
