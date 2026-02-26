@@ -35,9 +35,13 @@
                             <div class="mb-3">
                                 <label class="form-label">Current profile photo</label>
                                 @if($user->profile_photo)
-                                    <p><img src="{{ asset('storage/' . $user->profile_photo) }}" alt="Avatar" class="rounded-circle" width="60" height="60" style="object-fit: cover;"></p>
+                                    <div class="border rounded p-3 mb-3" style="background-color: #f8f9fa; display: inline-block;">
+                                        <img src="{{ asset('storage/' . $user->profile_photo) }}" alt="Avatar" class="rounded" width="200" height="200" style="object-fit: cover; display: block;">
+                                    </div>
                                 @else
-                                    <p class="text-muted">No photo</p>
+                                    <div class="border rounded p-5 mb-3" style="background-color: #f8f9fa; text-align: center; width: 200px;">
+                                        <p class="text-muted">No photo</p>
+                                    </div>
                                 @endif
                                 <label for="profile_photo" class="form-label">New profile photo <span class="text-muted small">(optional, JPEG/PNG max 2MB)</span></label>
                                 <input id="profile_photo" type="file" name="profile_photo" class="form-control" accept="image/jpeg,image/png,image/jpg,image/gif">
