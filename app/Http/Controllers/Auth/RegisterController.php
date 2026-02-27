@@ -32,7 +32,10 @@ class RegisterController extends Controller
         }
 
         $user = User::create($data);
-        event(new Registered($user));
+
+        // Send verification email manually using custom service
+        $emailService = new \App\Services\EmailVerificationService();
+        $emailService->sendVerificationEmail($user);
 
         return redirect()->route('login')->with('status', 'Registration successful. Please verify your email before logging in.');
     }

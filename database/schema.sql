@@ -3,6 +3,12 @@
 -- E-commerce / User & Product Management System
 -- Run after: CREATE DATABASE app_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 -- =============================================================================
+CREATE DATABASE IF NOT EXISTS app_db 
+CHARACTER SET utf8mb4 
+COLLATE utf8mb4_unicode_ci;
+
+USE app_db;
+
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
