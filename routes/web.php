@@ -8,12 +8,18 @@ use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\ShopController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 
 // Guest
 Route::get('/', HomeController::class)->name('home');
+Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/register', function () {
     return view('auth.register');
 })->name('register');
@@ -33,10 +39,18 @@ Route::get('/email/verify/status', [EmailVerificationController::class, 'status'
 Route::get('/verification/success', [EmailVerificationController::class, 'success'])->name('verification.success');
 Route::get('/verification/failed', [EmailVerificationController::class, 'failed'])->name('verification.failed');
 
-// Authenticated
+// Authenticated (FR4: Shopping cart — customers only need auth+verified)
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+    Route::put('/cart/{cart_item}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/{cart_item}', [CartController::class, 'destroy'])->name('cart.destroy');
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 });
 
 // Admin (FR3.2, FR3.3: /admin/* protected; 403 if not admin)
@@ -44,7 +58,9 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.'
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::post('/users/{user}/status', [AdminUserController::class, 'updateStatus'])->name('users.update-status');
     Route::post('/users/{user}/role', [AdminUserController::class, 'updateRole'])->name('users.update-role');
-    
+    Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+    Route::post('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
+
     // Product Management (FR2.1 - FR2.7)
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');

@@ -15,6 +15,19 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('home') }}" style="color: var(--pastry-text); font-weight: 500;">Home</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('shop.index') }}" style="color: var(--pastry-text); font-weight: 500;">Shop</a>
+                </li>
+                @auth
+                @if (!Auth::user()->isAdmin())
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('cart.index') }}" style="color: var(--pastry-text); font-weight: 500;"><i class="fas fa-shopping-cart me-1"></i>Cart</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('orders.index') }}" style="color: var(--pastry-text); font-weight: 500;">My Orders</a>
+                </li>
+                @endif
+                @endauth
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="navbarDropdown" role="button"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: var(--pastry-text); font-weight: 500;">
@@ -24,6 +37,7 @@
                     <div class="dropdown-menu dropdown-menu-end shadow-sm" style="border: 1px solid var(--pastry-sand); border-radius: 8px;">
                         @if (Auth::check() && Auth::user()->isAdmin())
                             <a class="dropdown-item" href="{{ route('admin.users.index') }}"><i class="fas fa-users me-2"></i>Users</a>
+                            <a class="dropdown-item" href="{{ route('admin.orders.index') }}"><i class="fas fa-receipt me-2"></i>Orders</a>
                             <hr class="dropdown-divider">
                         @endif
                         @if (Auth::check())

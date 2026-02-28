@@ -32,13 +32,13 @@ class LoginController extends Controller
         $request->session()->regenerate();
         $user = Auth::user();
 
+        // FR3.1: Only verified users may log in; send to verify page so they can resend if link expired
         if (!$user->hasVerifiedEmail()) {
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-            return redirect()->route('login')->withErrors([
-                'email' => 'You must verify your email before logging in.',
-            ])->withInput($request->only('email'));
+            Auth::login($user);
+            $request->session()->regenerate();
+            return redirect()->route('verification.notice')->withErrors([
+                'email' => 'You must verify your email before logging in. Use the button below to resend the verification link.',
+            ]);
         }
 
         if (!$user->isActive()) {
