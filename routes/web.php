@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -55,6 +56,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // Admin (FR3.2, FR3.3: /admin/* protected; 403 if not admin)
 Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.')->group(function () {
+    Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+    
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::post('/users/{user}/status', [AdminUserController::class, 'updateStatus'])->name('users.update-status');
     Route::post('/users/{user}/role', [AdminUserController::class, 'updateRole'])->name('users.update-role');
@@ -73,5 +76,6 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.'
     Route::delete('/products/{product}/force', [ProductController::class, 'forceDelete'])->name('products.force-delete');
     Route::get('/products/trash', [ProductController::class, 'trash'])->name('products.trash');
     Route::post('/products/import', [ProductController::class, 'import'])->name('products.import');
+    Route::post('/products/bulk-delete', [ProductController::class, 'bulkDelete'])->name('products.bulk-delete');
     Route::get('/products/error-report/download', [ProductController::class, 'downloadErrorReport'])->name('products.error-report.download');
 });

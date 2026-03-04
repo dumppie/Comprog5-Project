@@ -22,7 +22,7 @@ class ProductController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('products.index', compact('products'));
+        return view('admin.products.index', compact('products'));
     }
 
     public function create(): View
@@ -252,6 +252,48 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to import products: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function bulkDelete(Request $request): JsonResponse
+    {
+        try {
+            DB::beginTransaction();
+            
+            $productIds = $request->product_ids;
+            $deletedCount = 0;
+            
+            foreach ($productIds as $productId) {
+                $product = Product::find($productId);
+                if ($product) {
+                    // Delete associated photos
+                    if ($product->thumbnail_photo) {
+                        Storage::disk('public')->delete($product->thumbnail_photo);
+                    }
+                    
+                    foreach ($product->photos as $photo) {
+                        Storage::disk('public')->delete($photo->photo_path);
+                        $photo->delete();
+                    }
+                    
+                    $product->delete();
+                    $deletedCount++;
+                }
+            }
+            
+            DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully deleted {$deletedCount} products"
+            ]);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete products: ' . $e->getMessage()
             ], 500);
         }
     }

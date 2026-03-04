@@ -12,9 +12,19 @@
                         <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
                             @csrf
                             <div class="mb-3">
-                                <label for="name" class="form-label">Name *</label>
-                                <input id="name" type="text" name="name" class="form-control" value="{{ old('name') }}" required autofocus>
-                                @error('name') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                <label for="first_name" class="form-label">First Name *</label>
+                                <input id="first_name" type="text" name="first_name" class="form-control" value="{{ old('first_name') }}" required autofocus>
+                                @error('first_name') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="middle_name" class="form-label">Middle Name</label>
+                                <input id="middle_name" type="text" name="middle_name" class="form-control" value="{{ old('middle_name') }}">
+                                @error('middle_name') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="last_name" class="form-label">Last Name *</label>
+                                <input id="last_name" type="text" name="last_name" class="form-control" value="{{ old('last_name') }}" required>
+                                @error('last_name') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email *</label>

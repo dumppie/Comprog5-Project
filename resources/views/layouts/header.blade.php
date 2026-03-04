@@ -13,10 +13,32 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('home') }}" style="color: var(--pastry-text); font-weight: 500;">Home</a>
+                    @auth
+                        @if (Auth::user()->isAdmin())
+                            <a class="nav-link" href="{{ route('admin.dashboard') }}" style="color: var(--pastry-text); font-weight: 500;">
+                                <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                            </a>
+                        @else
+                            <a class="nav-link" href="{{ route('home') }}" style="color: var(--pastry-text); font-weight: 500;">Home</a>
+                        @endif
+                    @endauth
+                    @guest
+                        <a class="nav-link" href="{{ route('home') }}" style="color: var(--pastry-text); font-weight: 500;">Home</a>
+                    @endguest
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('shop.index') }}" style="color: var(--pastry-text); font-weight: 500;">Shop</a>
+                    @auth
+                        @if (Auth::user()->isAdmin())
+                            <a class="nav-link" href="{{ route('admin.products.index') }}" style="color: var(--pastry-text); font-weight: 500;">
+                                <i class="fas fa-box me-1"></i>Product Management
+                            </a>
+                        @else
+                            <a class="nav-link" href="{{ route('shop.index') }}" style="color: var(--pastry-text); font-weight: 500;">Shop</a>
+                        @endif
+                    @endauth
+                    @guest
+                        <a class="nav-link" href="{{ route('shop.index') }}" style="color: var(--pastry-text); font-weight: 500;">Shop</a>
+                    @endguest
                 </li>
                 @auth
                 @if (!Auth::user()->isAdmin())

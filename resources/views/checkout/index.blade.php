@@ -15,7 +15,7 @@
                             <h5 class="mb-3" style="color: var(--pastry-brown);">Shipping details (FR5.2)</h5>
                             <div class="mb-3">
                                 <label for="shipping_name" class="form-label">Name *</label>
-                                <input type="text" id="shipping_name" name="shipping_name" class="form-control" value="{{ old('shipping_name', $user->name) }}" required>
+                                <input type="text" id="shipping_name" name="shipping_name" class="form-control" value="{{ old('shipping_name', $user->full_name) }}" required>
                                 @error('shipping_name') <div class="text-danger small">{{ $message }}</div> @enderror
                             </div>
                             <div class="mb-3">

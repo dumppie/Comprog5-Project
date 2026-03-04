@@ -50,6 +50,11 @@ class LoginController extends Controller
             ])->withInput($request->only('email'));
         }
 
+        // Redirect admins to admin dashboard, others to home
+        if ($user->isAdmin()) {
+            return redirect()->intended(route('admin.dashboard', absolute: false));
+        }
+
         return redirect()->intended(route('home', absolute: false));
     }
 

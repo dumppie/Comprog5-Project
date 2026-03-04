@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterUserRequest;
-use App\Models\Role;
 use App\Models\User;
 use App\Models\UserStatus;
 use Illuminate\Auth\Events\Registered;
@@ -24,7 +23,7 @@ class RegisterController extends Controller
     {
         $data = $request->validated();
         $data['password'] = Hash::make($data['password']);
-        $data['role_id'] = Role::where('name', 'customer')->firstOrFail()->id;
+        $data['is_admin'] = false;
         $data['user_status_id'] = UserStatus::where('name', 'active')->firstOrFail()->id;
 
         if ($request->hasFile('profile_photo')) {

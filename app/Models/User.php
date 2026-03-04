@@ -13,13 +13,15 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name',
+        'first_name',
+        'middle_name',
+        'last_name',
         'email',
         'password',
         'contact_number',
         'profile_photo',
         'address',
-        'role_id',
+        'is_admin',
         'user_status_id',
         'email_verification_token',
     ];
@@ -37,10 +39,6 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    public function role(): BelongsTo
-    {
-        return $this->belongsTo(Role::class);
-    }
 
     public function userStatus(): BelongsTo
     {
@@ -59,11 +57,26 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function isAdmin(): bool
     {
-        return $this->role && $this->role->name === 'admin';
+        return $this->is_admin;
     }
 
     public function isActive(): bool
     {
         return $this->userStatus && $this->userStatus->name === 'active';
+    }
+
+    public function getFullNameAttribute(): string
+    {
+        $fullName = $this->first_name;
+        if ($this->middle_name) {
+            $fullName .= ' ' . $this->middle_name;
+        }
+        $fullName .= ' ' . $this->last_name;
+        return trim($fullName);
+    }
+
+    public function getNameAttribute(): string
+    {
+        return $this->getFullNameAttribute();
     }
 }

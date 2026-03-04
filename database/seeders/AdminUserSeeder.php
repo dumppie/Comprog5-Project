@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Role;
 use App\Models\User;
 use App\Models\UserStatus;
 use Illuminate\Database\Seeder;
@@ -12,11 +11,10 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Ensure we have the admin role and active status
-        $adminRoleId = Role::where('name', 'admin')->value('id');
+        // Ensure we have the active status
         $activeStatusId = UserStatus::where('name', 'active')->value('id');
 
-        if (!$adminRoleId || !$activeStatusId) {
+        if (!$activeStatusId) {
             return;
         }
 
@@ -24,9 +22,11 @@ class AdminUserSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'mervin@gmail.com'],
             [
-                'name' => 'Mervin',
+                'first_name' => 'Mervin',
+                'middle_name' => null,
+                'last_name' => 'Admin',
                 'password' => Hash::make('admin1'),
-                'role_id' => $adminRoleId,
+                'is_admin' => true,
                 'user_status_id' => $activeStatusId,
                 'email_verified_at' => now(),
             ]
@@ -36,9 +36,11 @@ class AdminUserSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'miguel@gmail.com'],
             [
-                'name' => 'Miguel',
+                'first_name' => 'Miguel',
+                'middle_name' => null,
+                'last_name' => 'Admin',
                 'password' => Hash::make('admin2'),
-                'role_id' => $adminRoleId,
+                'is_admin' => true,
                 'user_status_id' => $activeStatusId,
                 'email_verified_at' => now(),
             ]

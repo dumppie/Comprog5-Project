@@ -14,7 +14,7 @@ class AdminUpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'role_id' => ['required', 'exists:roles,id'],
+            'is_admin' => ['required', 'boolean'],
             'user_status_id' => ['required', 'exists:user_statuses,id'],
         ];
     }

@@ -101,4 +101,49 @@ class Product extends Model
     {
         return $this->trashed();
     }
+
+    // Inventory Management Methods
+    public function isLowStock(): bool
+    {
+        $threshold = config('shop.low_stock_threshold', 5);
+        return $this->stock_quantity > 0 && $this->stock_quantity <= $threshold;
+    }
+
+    public function isOutOfStock(): bool
+    {
+        return $this->stock_quantity <= 0;
+    }
+
+    public function getStockStatusLevel(): string
+    {
+        if ($this->isOutOfStock()) {
+            return 'out_of_stock';
+        }
+        
+        if ($this->isLowStock()) {
+            return 'low_stock';
+        }
+        
+        return 'in_stock';
+    }
+
+    public function checkAndNotifyLowStock(): void
+    {
+        if ($this->isOutOfStock() || $this->isLowStock()) {
+            $this->notifyAdminAboutStockLevel();
+        }
+    }
+
+    private function notifyAdminAboutStockLevel(): void
+    {
+        $adminEmail = config('shop.admin_email', 'admin@example.com');
+        $stockStatus = $this->isOutOfStock() ? 'Out of Stock' : 'Low Stock';
+        
+        \Illuminate\Support\Facades\Mail::to($adminEmail)
+            ->send(new \App\Mail\LowStockNotification(
+                $this,
+                $this->stock_quantity,
+                $stockStatus
+            ));
+    }
 }

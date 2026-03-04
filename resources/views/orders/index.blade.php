@@ -6,7 +6,7 @@
         <div class="card card-pastry">
             <div class="card-body p-4">
                 <p class="text-uppercase mb-1" style="letter-spacing: 0.15em; color: var(--pastry-caramel); font-size: 0.85rem;">Orders</p>
-                <h2 class="font-serif mb-4" style="color: var(--pastry-brown);">Order history (FR5.6)</h2>
+                <h2 class="font-serif mb-4" style="color: var(--pastry-brown);">Order History</h2>
 
                 @if($orders->isEmpty())
                     <p class="text-muted">You have no orders yet.</p>

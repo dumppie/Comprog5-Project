@@ -35,7 +35,7 @@
                                     @php $dir = (request('sort') === 'email' && request('dir') === 'asc') ? 'desc' : 'asc'; @endphp
                                     <a href="{{ route('admin.users.index', ['search' => request('search'), 'sort' => 'email', 'dir' => $dir]) }}" class="text-decoration-none" style="color: inherit;">Email</a>
                                 </th>
-                                <th>Role</th>
+                                <th>Admin Status</th>
                                 <th>Status</th>
                                 <th>
                                     @php $dir = (request('sort') === 'created_at' && request('dir') === 'asc') ? 'desc' : 'asc'; @endphp
@@ -56,7 +56,11 @@
                                     </td>
                                     <td>{{ $u->name }}</td>
                                     <td>{{ $u->email }}</td>
-                                    <td>{{ $u->role->name ?? '—' }}</td>
+                                    <td>
+                                        <span class="badge {{ $u->is_admin ? 'bg-danger' : 'bg-primary' }}">
+                                            {{ $u->is_admin ? 'Admin' : 'Customer' }}
+                                        </span>
+                                    </td>
                                     <td>
                                         <span class="badge {{ $u->userStatus->name === 'active' ? 'bg-success' : 'bg-danger' }}">
                                             {{ $u->userStatus->name ?? '—' }}
@@ -77,10 +81,9 @@
                                             </form>
                                             <form action="{{ route('admin.users.update-role', $u) }}" method="POST" class="d-inline-block">
                                                 @csrf
-                                                <select name="role_id" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
-                                                    @foreach($roles as $r)
-                                                        <option value="{{ $r->id }}" {{ $u->role_id == $r->id ? 'selected' : '' }}>{{ $r->name }}</option>
-                                                    @endforeach
+                                                <select name="is_admin" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
+                                                    <option value="0" {{ !$u->is_admin ? 'selected' : '' }}>Customer</option>
+                                                    <option value="1" {{ $u->is_admin ? 'selected' : '' }}>Admin</option>
                                                 </select>
                                             </form>
                                         @endif

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminUpdateUserRequest;
-use App\Models\Role;
 use App\Models\User;
 use App\Models\UserStatus;
 use Illuminate\Http\RedirectResponse;
@@ -15,7 +14,7 @@ class UserController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = User::query()->with(['role', 'userStatus']);
+        $query = User::query()->with(['userStatus']);
 
         if ($search = $request->get('search')) {
             $query->where(function ($q) use ($search) {
@@ -36,7 +35,6 @@ class UserController extends Controller
 
         return view('dashboard.users', [
             'users' => $users,
-            'roles' => Role::all(),
             'userStatuses' => UserStatus::all(),
         ]);
     }
@@ -56,12 +54,12 @@ class UserController extends Controller
     public function updateRole(Request $request, User $user): RedirectResponse
     {
         if ($user->id === $request->user()->id) {
-            return back()->withErrors(['user' => 'You cannot change your own role.']);
+            return back()->withErrors(['user' => 'You cannot change your own admin status.']);
         }
 
-        $request->validate(['role_id' => 'required|exists:roles,id']);
-        $user->update(['role_id' => $request->role_id]);
+        $request->validate(['is_admin' => 'required|boolean']);
+        $user->update(['is_admin' => $request->is_admin]);
 
-        return back()->with('status', 'User role updated. Changes apply on next request.');
+        return back()->with('status', 'User admin status updated. Changes apply on next request.');
     }
 }
