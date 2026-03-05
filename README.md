@@ -38,7 +38,7 @@ Repository: **https://github.com/dumppie/Comprog5-Project.git**
    ```
    Open http://localhost:8000
 
-See **USER_ACCOUNT_SETUP.md** for user account (FR1) details and creating the first admin.
+See **USER_ACCOUNT_SETUP.md** for user accountdetails and creating the first admin.
 
 ---
 
