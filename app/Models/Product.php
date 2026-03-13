@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 
 class Product extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, Searchable;
 
     protected $fillable = [
         'name',
@@ -44,6 +45,21 @@ class Product extends Model
         return $this->hasOne(ProductPhoto::class)->where('is_thumbnail', true);
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function averageRating()
+    {
+        return $this->reviews()->avg('rating') ?? 0;
+    }
+
+    public function ratingCount()
+    {
+        return $this->reviews()->count();
+    }
+
     // Scopes
     public function scopeActive($query)
     {
@@ -63,6 +79,54 @@ class Product extends Model
     public function scopeOutOfStock($query)
     {
         return $query->where('stock_quantity', '<=', 0);
+    }
+
+    public function scopeSearch($query, $searchTerm)
+    {
+        if ($searchTerm) {
+            return $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('description', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('category', 'LIKE', "%{$searchTerm}%");
+            });
+        }
+        return $query;
+    }
+
+    public function scopePriceRange($query, $minPrice = null, $maxPrice = null)
+    {
+        if ($minPrice !== null) {
+            $query->where('price', '>=', $minPrice);
+        }
+        if ($maxPrice !== null) {
+            $query->where('price', '<=', $maxPrice);
+        }
+        return $query;
+    }
+
+    public function scopeCategory($query, $category)
+    {
+        if ($category) {
+            return $query->where('category', $category);
+        }
+        return $query;
+    }
+
+    // Scout Searchable methods
+    public function toSearchableArray()
+    {
+        return [
+            'name' => $this->name,
+            'description' => $this->description,
+            'category' => $this->category,
+            'price' => $this->price,
+            'status' => $this->status,
+        ];
+    }
+
+    public function shouldBeSearchable()
+    {
+        return $this->status === 'active' && !$this->trashed();
     }
 
     // Accessors

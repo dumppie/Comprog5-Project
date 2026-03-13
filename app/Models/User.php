@@ -45,14 +45,42 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(UserStatus::class, 'user_status_id');
     }
 
-    public function cartItems(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function cartItems()
     {
         return $this->hasMany(CartItem::class);
     }
 
-    public function orders(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function reviews()
     {
-        return $this->hasMany(Order::class);
+        return $this->hasMany(Review::class);
+    }
+
+    public function hasPurchasedProduct($productId): bool
+    {
+        return $this->orders()
+            ->whereHas('items', function ($query) use ($productId) {
+                $query->where('product_id', $productId);
+            })
+            ->exists();
+    }
+
+    public function hasReviewedProduct($productId): bool
+    {
+        return $this->reviews()
+            ->where('product_id', $productId)
+            ->exists();
+    }
+
+    public function getReviewForProduct($productId): ?Review
+    {
+        return $this->reviews()
+            ->where('product_id', $productId)
+            ->first();
     }
 
     public function isAdmin(): bool

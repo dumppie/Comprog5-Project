@@ -91,6 +91,79 @@ This document verifies implementation status of **FR1 (User Account Management)*
 
 ---
 
+## 7. Search
+
+| ID | Requirement | Status | Implementation |
+|----|-------------|--------|----------------|
+| **FR7.1** | Allow customers to search for products by name or keyword on the home page via SQL LIKE query | ✅ Complete | `HomeController@__invoke` handles search parameter; `Product::scopeSearch()` implements LIKE query on name, description, category. Search form on home page with AJAX loading. |
+| **FR7.2** | Refactor search to use an Eloquent model scope for cleaner, reusable query logic | ✅ Complete | `Product::scopeSearch($searchTerm)` method encapsulates search logic, used in HomeController and ShopController. Reusable across controllers with clean separation of concerns. |
+| **FR7.3** | Upgrade to Laravel Scout (Meilisearch/Algolia) with paginated results for faster, typo-tolerant searching | ✅ Complete | Laravel Scout added to composer.json; `Product` uses `Searchable` trait with `toSearchableArray()` and `shouldBeSearchable()`. HomeController uses Scout when available, falls back to LIKE query. Config: `config/scout.php`. |
+
+**FR7 summary:** All 3 items are implemented.
+
+---
+
+## 8. Filter
+
+| ID | Requirement | Status | Implementation |
+|----|-------------|--------|----------------|
+| **FR8.1** | Allow customers to filter products by price range (min/max) via AJAX without a full page reload | ✅ Complete | `Product::scopePriceRange($min, $max)` method; HomeController handles min_price/max_price parameters. AJAX-powered filtering with loading overlay. Price inputs in filter section. |
+| **FR8.2** | Allow customers to combine the price filter with a category/brand/type filter; active filters shall be visually indicated and individually clearable | ✅ Complete | `Product::scopeCategory($category)` method; Combined search + price + category filtering. Visual filter badges show active filters with × to remove individually. "Clear All" button. AJAX updates without page reload. |
+
+**FR8 summary:** All 2 items are implemented.
+
+---
+
+## 9. Product Reviews
+
+| ID | Requirement | Status | Implementation |
+|----|-------------|--------|----------------|
+| **FR9.1** | Only customers who have purchased a product may post one review (comment + star rating 1–5) per product. The review form is hidden from non-buyers; direct POST requests return 403. | ✅ Complete | `ReviewController@store` checks `hasPurchasedProduct()` via `User::hasPurchasedProduct()`. `ReviewRequest` authorization prevents non-buyers. Form hidden in views using `hasPurchasedProduct()` check. |
+| **FR9.2** | Customers who have purchased a product may post and update their own review and rating. The Edit button is visible only to the review author. | ✅ Complete | `ReviewController@edit/@update` with `isAuthor()` authorization. Edit button only shown when `$review->isAuthor(auth()->user())`. One review per product enforced via database unique constraint. |
+| **FR9.3** | The system shall display all reviews in a searchable, sortable datatable accessible to the admin (columns: product, reviewer, rating, comment, date). | ✅ Complete | `Admin\ReviewController@index` with search/sort functionality. View: `admin/reviews/index.blade.php` with datatable, search by product/reviewer/comment, sort by date/rating/product/reviewer. |
+| **FR9.4** | The administrator shall be able to permanently delete any user review; the product's average rating shall be recalculated automatically. | ✅ Complete | `Admin\ReviewController@destroy` deletes reviews. `Product::averageRating()` recalculates automatically via `reviews()->avg('rating')`. Database unique constraint on (product_id, user_id). |
+
+**FR9 summary:** All 4 items are implemented.
+
+---
+
+## 10. Validation
+
+| ID | Requirement | Status | Implementation |
+|----|-------------|--------|----------------|
+| **FR10.1** | The system shall validate all input fields in the add/edit product form (e.g., price must be numeric, required fields must not be empty, image type/size constraints) using Laravel Form Requests; errors are shown inline. | ✅ Complete | `ProductRequest` validation: required fields, numeric price, integer stock, file type/size (JPEG/PNG, 2MB max). Inline errors shown via `@error` directives in product forms. |
+| **FR10.2** | The system shall validate all input fields in the user registration form (e.g., unique email, password strength min 8 chars/1 uppercase/1 number, password confirmation). | ✅ Complete | `RegisterUserRequest` with `Password::min(8)->letters()->mixedCase()->numbers()`. Unique email validation, password confirmation, profile photo constraints. |
+| **FR10.3** | Client-side (JavaScript) validation shall mirror server-side rules for immediate feedback; forms cannot be submitted while invalid. | ✅ Complete | `public/js/validation.js` with `FormValidator` class. Real-time validation on input/blur, prevents invalid submissions. Auto-initializes for product and registration forms. |
+
+**FR10 summary:** All 3 items are implemented.
+
+---
+
+## 11. Charts & Reports
+
+| ID | Requirement | Status | Implementation |
+|----|-------------|--------|----------------|
+| **FR11.1** | The system shall display a chart showing yearly sales data. | ✅ Complete | `Admin\ReportController@yearlySales` with Chart.js bar chart. View: `admin/reports/yearly-sales.blade.php`. Groups by YEAR(created_at), shows total sales and order count. |
+| **FR11.2** | The system shall display a chart showing monthly sales data. | ✅ Complete | `Admin\ReportController@monthlySales` with Chart.js line chart. View: `admin/reports/monthly-sales.blade.php`. Year selector, fills missing months with zero values. |
+| **FR11.3** | The system shall display a sales bar chart with a date range filter using a date picker (start date – end date). | ✅ Complete | `Admin\ReportController@dateRangeSales` with date range filtering. View: `admin/reports/date-range-sales.blade.php`. Date pickers for start/end dates, daily sales bar chart. |
+| **FR11.4** | The system shall display a pie chart showing the percentage of total sales contributed by each product. | ✅ Complete | `Admin\ReportController@productSales` with Chart.js pie chart. View: `admin/reports/product-sales.blade.php`. Calculates percentages, shows product distribution with progress bars. |
+
+**FR11 summary:** All 4 items are implemented.
+
+---
+
+## 12. Security
+
+| ID | Requirement | Status | Implementation |
+|----|-------------|--------|----------------|
+| **FR12.1** | The system shall hash all passwords before storing them in the database. | ✅ Complete | `User` model uses `'password' => 'hashed'` cast (Laravel 11). `RegisterController` uses `Hash::make()`. Passwords never stored in plain text. |
+| **FR12.2** | All user inputs shall be sanitized and validated. SQL injection shall be prevented using Eloquent ORM or prepared statements. XSS shall be mitigated via proper Blade templating discipline. | ✅ Complete | Laravel Form Requests (`ProductRequest`, `RegisterUserRequest`, `ReviewRequest`) validate all inputs. Eloquent ORM prevents SQL injection. Blade auto-escapes output (`{{ }}`). Added `InputSanitization` middleware for extra protection. |
+| **FR12.3** | The system shall restrict all admin functionalities to authorized admin users only. | ✅ Complete | `EnsureUserIsAdmin` middleware applied to all `/admin/*` routes. Checks `$user->isAdmin()`. Returns 403 for non-admin users. Admin routes protected by `['auth', 'verified', 'admin']` middleware group. |
+
+**FR12 summary:** All 3 items are implemented.
+
+---
+
 ## Quick reference – Where to look
 
 - **FR1:** `app/Http/Controllers/Auth/RegisterController.php`, `LoginController.php`, `ProfileController.php`, `Admin/UserController.php`; `resources/views/auth/`, `users/profile.blade.php`, `dashboard/users.blade.php`.
@@ -99,3 +172,9 @@ This document verifies implementation status of **FR1 (User Account Management)*
 - **FR4:** `app/Http/Controllers/CartController.php`, `ShopController.php`; `app/Models/CartItem.php`; `resources/views/cart/index.blade.php`, `shop/index.blade.php`. Routes: `cart.index`, `cart.store`, `cart.update`, `cart.destroy`, `shop.index`.
 - **FR5:** `app/Http/Controllers/CheckoutController.php`, `OrderController.php`, `Admin/OrderController.php`; `app/Models/Order.php`, `OrderItem.php`, `OrderStatus.php`, `PaymentMethod.php`; `app/Mail/OrderConfirmationMail.php`, `OrderStatusUpdatedMail.php`; `resources/views/checkout/index.blade.php`, `orders/`, `admin/orders/`, `emails/order-confirmation.blade.php`, `emails/order-status-updated.blade.php`, `pdf/receipt.blade.php`. Routes: `checkout.index`, `checkout.store`, `orders.index`, `orders.show`, `admin.orders.index`, `admin.orders.update-status`.
 - **FR6:** Stock decrease in `CheckoutController@store`; low/out of stock alert on `admin/orders/index` (config: `config/shop.php`, `LOW_STOCK_THRESHOLD`).
+- **FR7:** `app/Models/Product.php` (scopeSearch, Searchable trait), `app/Http/Controllers/HomeController.php` (search handling), `config/scout.php`, `resources/views/home.blade.php` (search form, AJAX). Routes: `home`.
+- **FR8:** `app/Models/Product.php` (scopePriceRange, scopeCategory), `app/Http/Controllers/HomeController.php` (filter handling), `resources/views/home.blade.php` (filter section, AJAX, visual indicators).
+- **FR9:** `app/Models/Review.php`, `app/Models/Product.php` (reviews relationship), `app/Models/User.php` (hasPurchasedProduct, hasReviewedProduct), `app/Http/Controllers/ReviewController.php`, `app/Http/Controllers/Admin/ReviewController.php`, `app/Http/Requests/ReviewRequest.php`; `resources/views/reviews/edit.blade.php`, `admin/reviews/index.blade.php`. Routes: `reviews.store`, `reviews.edit`, `reviews.update`, `admin.reviews.index`, `admin.reviews.destroy`.
+- **FR10:** `app/Http/Requests/ProductRequest.php`, `app/Http/Requests/RegisterUserRequest.php`, `public/js/validation.js` (FormValidator class). Enhanced validation with real-time feedback, password strength, file constraints.
+- **FR11:** `app/Http/Controllers/Admin/ReportController.php` (yearly, monthly, date-range, product sales), `resources/views/admin/reports/` (dashboard, yearly-sales, monthly-sales, date-range-sales, product-sales). Chart.js integration for data visualization. Routes: `admin.reports.*`.
+- **FR12:** `app/Models/User.php` (password hashing), `app/Http/Middleware/EnsureUserIsAdmin.php` (admin restriction), `app/Http/Middleware/InputSanitization.php`, `app/Http/Middleware/SecurityHeaders.php`. Laravel's built-in CSRF, Eloquent ORM, Blade escaping for comprehensive security.

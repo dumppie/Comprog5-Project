@@ -227,7 +227,7 @@ class ProductController extends Controller
             ->orderBy('deleted_at', 'desc')
             ->get();
 
-        return view('products.trash', compact('trashedProducts'));
+        return view('products.trash_test', compact('trashedProducts'));
     }
 
     public function import(Request $request): JsonResponse

@@ -16,6 +16,7 @@
                 @else
                     <p class="mb-0">Hello, <strong>{{ auth()->user()->name }}</strong>. Welcome back.</p>
                     <a href="{{ route('profile.edit') }}" class="btn btn-pastry mt-3">My Profile</a>
+                    <a href="{{ route('shop.index') }}" class="btn btn-outline-pastry mt-3 ms-2">Browse Products</a>
                 @endguest
             </div>
         </div>

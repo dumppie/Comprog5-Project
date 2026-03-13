@@ -16,7 +16,7 @@
                         <button class="btn btn-success btn-sm" onclick="showImportModal()">
                             <i class="fas fa-file-excel"></i> Import Excel
                         </button>
-                        <a href="{{ route('admin.products.trash') }}" class="btn btn-warning btn-sm">
+                        <a href="{{ route('admin.trash.index') }}" class="btn btn-warning btn-sm">
                             <i class="fas fa-trash"></i> Trash
                         </a>
                     </div>

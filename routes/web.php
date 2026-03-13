@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\ReportController as AdminReportController;
+use App\Http\Controllers\Admin\TrashController as AdminTrashController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -14,6 +17,7 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -52,6 +56,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    
+    // Reviews (FR9)
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::get('/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
+    Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
 });
 
 // Admin (FR3.2, FR3.3: /admin/* protected; 403 if not admin)
@@ -63,6 +72,9 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.'
     Route::post('/users/{user}/role', [AdminUserController::class, 'updateRole'])->name('users.update-role');
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::post('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
+
+    // Trash Management
+    Route::get('/trash', [AdminTrashController::class, 'index'])->name('trash.index');
 
     // Product Management (FR2.1 - FR2.7)
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
@@ -78,4 +90,16 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.'
     Route::post('/products/import', [ProductController::class, 'import'])->name('products.import');
     Route::post('/products/bulk-delete', [ProductController::class, 'bulkDelete'])->name('products.bulk-delete');
     Route::get('/products/error-report/download', [ProductController::class, 'downloadErrorReport'])->name('products.error-report.download');
+
+    // Reviews Management (FR9.3, FR9.4)
+    Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+    Route::delete('/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
+
+    // Reports & Analytics (FR11)
+    Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/dashboard', [AdminReportController::class, 'dashboard'])->name('reports.dashboard');
+    Route::get('/reports/yearly-sales', [AdminReportController::class, 'yearlySales'])->name('reports.yearly-sales');
+    Route::get('/reports/monthly-sales', [AdminReportController::class, 'monthlySales'])->name('reports.monthly-sales');
+    Route::get('/reports/date-range-sales', [AdminReportController::class, 'dateRangeSales'])->name('reports.date-range-sales');
+    Route::get('/reports/product-sales', [AdminReportController::class, 'productSales'])->name('reports.product-sales');
 });

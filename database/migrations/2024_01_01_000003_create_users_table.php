@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('contact_number', 50)->nullable();
             $table->string('profile_photo')->nullable();
             $table->text('address')->nullable();
-            $table->foreignId('role_id')->constrained('roles')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreignId('user_status_id')->constrained('user_statuses')->cascadeOnUpdate()->restrictOnDelete();
             $table->rememberToken();
             $table->timestamps();

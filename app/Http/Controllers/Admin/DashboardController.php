@@ -14,9 +14,14 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Get sales data by month
+        // Get sales data by month (works for both MySQL and SQLite)
+        $driver = DB::getDriverName();
+        $monthExpr = $driver === 'sqlite'
+            ? "CAST(strftime('%m', orders.created_at) AS INTEGER)"
+            : 'MONTH(orders.created_at)';
+
         $monthlySales = Order::join('order_items', 'orders.id', '=', 'order_items.order_id')
-            ->selectRaw('MONTH(orders.created_at) as month, SUM(order_items.unit_price * order_items.quantity) as total')
+            ->selectRaw("{$monthExpr} as month, SUM(order_items.unit_price * order_items.quantity) as total")
             ->whereYear('orders.created_at', date('Y'))
             ->groupBy('month')
             ->orderBy('month')
