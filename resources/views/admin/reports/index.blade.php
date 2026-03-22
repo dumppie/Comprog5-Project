@@ -1,11 +1,10 @@
-@extends('layouts.base')
+@extends('layouts.admin')
 @section('title', 'Reports & Analytics')
-@section('body')
+@section('content')
     @include('layouts.flash-messages')
-    <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="font-serif" style="color: var(--pastry-brown);">Reports & Analytics</h2>
-        </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="font-serif" style="color: var(--pastry-brown);">Reports & Analytics</h2>
+    </div>
 
         <!-- Report Navigation -->
         <div class="row">
@@ -75,5 +74,4 @@
                 </div>
             </div>
         </div>
-    </div>
 @endsection

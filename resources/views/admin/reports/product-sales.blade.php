@@ -1,12 +1,11 @@
-@extends('layouts.base')
+@extends('layouts.admin')
 @section('title', 'Product Sales Distribution')
-@section('body')
+@section('content')
     @include('layouts.flash-messages')
-    <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="font-serif" style="color: var(--pastry-brown);">Product Sales Distribution</h2>
-            <a href="{{ route('admin.reports.dashboard') }}" class="btn btn-outline-secondary">← Back to Dashboard</a>
-        </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="font-serif" style="color: var(--pastry-brown);">Product Sales Distribution</h2>
+        <a href="{{ route('admin.reports.dashboard') }}" class="btn btn-outline-secondary">← Back to Dashboard</a>
+    </div>
 
         <div class="row">
             <div class="col-md-8">

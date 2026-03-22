@@ -1,12 +1,11 @@
-@extends('layouts.base')
+@extends('layouts.admin')
 @section('title', 'Date Range Sales Report')
-@section('body')
+@section('content')
     @include('layouts.flash-messages')
-    <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="font-serif" style="color: var(--pastry-brown);">Date Range Sales Report</h2>
-            <a href="{{ route('admin.reports.dashboard') }}" class="btn btn-outline-secondary">← Back to Dashboard</a>
-        </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="font-serif" style="color: var(--pastry-brown);">Date Range Sales Report</h2>
+        <a href="{{ route('admin.reports.dashboard') }}" class="btn btn-outline-secondary">← Back to Dashboard</a>
+    </div>
 
         <!-- Date Filter Form -->
         <div class="card mb-4">

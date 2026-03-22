@@ -1,11 +1,10 @@
-@extends('layouts.base')
+@extends('layouts.admin')
 @section('title', 'Monthly Sales Report')
-@section('body')
+@section('content')
     @include('layouts.flash-messages')
-    <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="font-serif" style="color: var(--pastry-brown);">Monthly Sales Report</h2>
-            <div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="font-serif" style="color: var(--pastry-brown);">Monthly Sales Report</h2>
+        <div>
                 <form method="GET" action="{{ route('admin.reports.monthly-sales') }}" class="d-inline">
                     <select name="year" class="form-select d-inline-block w-auto" onchange="this.form.submit()">
                         @foreach($availableYears as $year)

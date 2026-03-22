@@ -332,6 +332,30 @@
                             <i class="fas fa-shopping-cart me-1"></i>Orders
                         </a>
                     </li>
+                    
+                    <!-- Reports & Analytics -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-chart-bar me-1"></i>Reports
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ route('admin.reports.dashboard') }}">
+                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ route('admin.reports.yearly-sales') }}">
+                                <i class="fas fa-chart-line me-2"></i>Yearly Sales
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ route('admin.reports.monthly-sales') }}">
+                                <i class="fas fa-calendar me-2"></i>Monthly Sales
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ route('admin.reports.date-range-sales') }}">
+                                <i class="fas fa-filter me-2"></i>Date Range Sales
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ route('admin.reports.product-sales') }}">
+                                <i class="fas fa-pie-chart me-2"></i>Product Sales
+                            </a></li>
+                        </ul>
+                    </li>
                 </ul>
                 
                 <!-- User Menu -->
