@@ -12,7 +12,6 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ProductsImport;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -216,16 +215,6 @@ class ProductController extends Controller
                 'message' => 'Failed to permanently delete product: ' . $e->getMessage()
             ], 500);
         }
-    }
-
-    public function showCustomer($id): View
-    {
-        $product = Product::with(['photos', 'thumbnail', 'reviews.user'])
-            ->withAvgRating()
-            ->withReviewsCount()
-            ->findOrFail($id);
-
-        return view('products.show-customer', compact('product'));
     }
 
     public function trash(): View
