@@ -129,6 +129,36 @@ class Product extends Model
         return $this->status === 'active' && !$this->trashed();
     }
 
+    // Scope for average rating
+    public function scopeWithAvgRating($query)
+    {
+        return $query->withAvgRating();
+    }
+
+    // Scope for reviews count
+    public function scopeWithReviewsCount($query)
+    {
+        return $query->withReviewsCount();
+    }
+
+    // Accessor for average rating
+    public function getAvgRatingAttribute()
+    {
+        if (!isset($this->relations['avg_rating'])) {
+            $this->load('avg_rating');
+        }
+        return $this->avg_rating ?? 0;
+    }
+
+    // Accessor for reviews count
+    public function getReviewsCountAttribute()
+    {
+        if (!isset($this->relations['reviews_count'])) {
+            $this->load('reviews_count');
+        }
+        return $this->reviews_count ?? 0;
+    }
+
     // Accessors
     public function getFormattedPriceAttribute()
     {

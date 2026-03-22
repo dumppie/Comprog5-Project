@@ -117,7 +117,11 @@
                                     </div>
                                 @endif
                                 <div class="card-body d-flex flex-column">
-                                    <h5 class="card-title font-serif" style="color: var(--pastry-brown);">{{ $product->name }}</h5>
+                                    <h5 class="card-title font-serif" style="color: var(--pastry-brown);">
+                                        <a href="{{ route('products.show', $product->id) }}" class="text-decoration-none text-dark">
+                                            {{ $product->name }}
+                                        </a>
+                                    </h5>
                                     <p class="card-text text-muted small flex-grow-1">{{ Str::limit($product->description, 60) }}</p>
                                     <p class="mb-2"><strong>{{ $product->formatted_price ?? '₱' . number_format($product->price, 2) }}</strong></p>
                                     @auth
