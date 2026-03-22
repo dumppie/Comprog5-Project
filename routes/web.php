@@ -60,7 +60,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
-    Route::get('/orders/{order}/receipt', [OrderController::class, 'downloadReceipt'])->name('orders.receipt');
     
     // Reviews (FR9)
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
@@ -93,7 +92,6 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.'
     Route::post('/products/{product}/restore', [ProductController::class, 'restore'])->name('products.restore');
     Route::delete('/products/{product}/force', [ProductController::class, 'forceDelete'])->name('products.force-delete');
     Route::post('/products/import', [ProductController::class, 'import'])->name('products.import');
-    Route::get('/products/import', [ProductController::class, 'importView'])->name('products.import.view');
     Route::post('/products/bulk-delete', [ProductController::class, 'bulkDelete'])->name('products.bulk-delete');
     Route::post('/products/bulk-restore', [ProductController::class, 'bulkRestore'])->name('products.bulk-restore');
     Route::delete('/products/bulk-force-delete', [ProductController::class, 'bulkForceDelete'])->name('products.bulk-force-delete');

@@ -40,9 +40,6 @@
                         <a class="nav-link" href="{{ route('shop.index') }}" style="color: var(--pastry-text); font-weight: 500;">Shop</a>
                     @endguest
                 </li>
-            </ul>
-            
-            <ul class="navbar-nav ms-auto">
                 @auth
                 @if (!Auth::user()->isAdmin())
                 <li class="nav-item">

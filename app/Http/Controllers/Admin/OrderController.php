@@ -53,21 +53,16 @@ class OrderController extends Controller
         if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
             try {
                 $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.receipt', compact('order'));
-                $pdfPath = storage_path('app/public/receipts/receipt-' . $order->transaction_id . '-' . time() . '.pdf');
-                
-                // Ensure directory exists
-                $directory = dirname($pdfPath);
-                if (!is_dir($directory)) {
-                    mkdir($directory, 0755, true);
-                }
-                
+                $pdfPath = storage_path('app/receipt-' . $order->id . '-' . time() . '.pdf');
                 $pdf->save($pdfPath);
             } catch (\Throwable $e) {
-                \Log::warning('Order status update PDF generation failed: ' . $e->getMessage());
+                \Log::warning('Order receipt PDF: ' . $e->getMessage());
             }
         }
-        
         Mail::to($order->user->email)->send(new OrderStatusUpdatedMail($order, $previousStatus, $pdfPath));
+        if ($pdfPath && file_exists($pdfPath)) {
+            @unlink($pdfPath);
+        }
 
         return back()->with('success', 'Order status updated and customer notified.');
     }

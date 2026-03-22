@@ -21,12 +21,9 @@ class ProductRequest extends FormRequest
      */
     public function rules(): array
     {
-        $categories = array_keys(config('categories.product_categories'));
-        $categoryString = implode(',', $categories);
-        
         $rules = [
             'name' => 'required|string|max:255',
-            'category' => 'required|string|in:' . $categoryString,
+            'category' => 'required|string|in:bread,cakes,pastries,cookies,pies,tarts,muffins,croissants,donuts,buns',
             'description' => 'nullable|string|max:2000',
             'price' => 'required|numeric|min:0|max:999999.99',
             'stock_quantity' => 'required|integer|min:0|max:999999',
@@ -41,7 +38,7 @@ class ProductRequest extends FormRequest
         // For update requests, make fields optional if not provided
         if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
             $rules['name'] = 'sometimes|string|max:255';
-            $rules['category'] = 'sometimes|string|in:' . $categoryString;
+            $rules['category'] = 'sometimes|string|in:bread,cakes,pastries,cookies,pies,tarts,muffins,croissants,donuts,buns';
             $rules['description'] = 'sometimes|nullable|string|max:2000';
             $rules['price'] = 'sometimes|numeric|min:0|max:999999.99';
             $rules['stock_quantity'] = 'sometimes|integer|min:0|max:999999';

@@ -63,7 +63,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function hasPurchasedProduct($productId): bool
     {
         return $this->orders()
-            ->whereHas('orderItems', function ($query) use ($productId) {
+            ->whereHas('items', function ($query) use ($productId) {
                 $query->where('product_id', $productId);
             })
             ->exists();
