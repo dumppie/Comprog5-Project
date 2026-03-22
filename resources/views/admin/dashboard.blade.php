@@ -156,8 +156,8 @@
                                 <tr>
                                     <td>#{{ $order->id }}</td>
                                     <td>{{ $order->user->name }}</td>
-                                    <td>{{ $order->orderItems->count() }} items</td>
-                                    <td class="fw-bold">${{ number_format($order->orderItems->sum(function($item) { return $item->unit_price * $item->quantity; }), 2) }}</td>
+                                    <td>{{ $order->items->count() }} items</td>
+                                    <td class="fw-bold">${{ number_format($order->items->sum(function($item) { return $item->unit_price * $item->quantity; }), 2) }}</td>
                                     <td>{{ $order->created_at->format('M d, Y H:i') }}</td>
                                 </tr>
                             @empty

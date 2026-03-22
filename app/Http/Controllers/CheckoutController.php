@@ -97,27 +97,7 @@ class CheckoutController extends Controller
         }
 
         $order->load(['orderItems.product', 'paymentMethod', 'orderStatus']);
-
-        // Generate PDF receipt
-        $pdfPath = null;
-        if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
-            try {
-                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.receipt', compact('order'));
-                $pdfPath = storage_path('app/public/receipts/receipt-' . $order->transaction_id . '-' . time() . '.pdf');
-                
-                // Ensure directory exists
-                $directory = dirname($pdfPath);
-                if (!is_dir($directory)) {
-                    mkdir($directory, 0755, true);
-                }
-                
-                $pdf->save($pdfPath);
-            } catch (\Throwable $e) {
-                \Log::warning('Order confirmation PDF generation failed: ' . $e->getMessage());
-            }
-        }
-
-        \Illuminate\Support\Facades\Mail::to($user->email)->send(new OrderConfirmationMail($order, $pdfPath));
+        \Illuminate\Support\Facades\Mail::to($user->email)->send(new OrderConfirmationMail($order));
 
         return redirect()->route('orders.show', $order)->with('success', 'Order placed successfully. Confirmation email sent.');
     }

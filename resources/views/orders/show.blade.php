@@ -41,12 +41,7 @@
                 <p class="mb-0">Tax: ₱{{ number_format($order->tax, 2) }}</p>
                 <p class="fw-bold">Grand total: ₱{{ number_format($order->total, 2) }}</p>
 
-                <div class="mt-4 d-flex gap-2">
-                    <a href="{{ route('orders.receipt', $order) }}" class="btn btn-pastry">
-                        <i class="fas fa-download me-1"></i> Download Receipt
-                    </a>
-                    <a href="{{ route('orders.index') }}" class="btn btn-outline-pastry">Back to orders</a>
-                </div>
+                <a href="{{ route('orders.index') }}" class="btn btn-outline-pastry mt-3">Back to orders</a>
             </div>
         </div>
     </div>

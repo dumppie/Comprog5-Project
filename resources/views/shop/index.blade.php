@@ -5,9 +5,9 @@
 .filter-section {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 12px;
-    padding: 1rem;
+    padding: 1.5rem;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    margin-bottom: 4rem;
+    margin-bottom: 2rem;
 }
 .filter-badge {
     background: var(--pastry-caramel);
@@ -33,10 +33,19 @@
     gap: 0.5rem;
 }
 .price-range-container input {
-    width: 80px;
+    width: 100px;
 }
 .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255,255,255,0.8);
     display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
 }
 </style>
 @endpush
@@ -44,21 +53,27 @@
 @section('body')
     @include('layouts.flash-messages')
     
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
 
-    <div class="container py-3">
-        <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <p class="text-uppercase mb-1" style="letter-spacing: 0.15em; color: var(--pastry-caramel); font-size: 0.85rem;">Shop</p>
-                <h2 class="font-serif" style="color: var(--pastry-brown);">Our Pastries</h2>
+                <h2 class="font-serif" style="color: var(--pastry-brown);">Our pastries</h2>
             </div>
             <a href="{{ route('home') }}" class="btn btn-outline-secondary">← Back to Home</a>
         </div>
 
         <!-- Search Section -->
-        <div class="row mb-3">
+        <div class="row mb-4">
             <div class="col-lg-8 mx-auto">
                 <form method="GET" action="{{ route('shop.index') }}" id="searchForm">
-                    <div class="input-group">
+                    <div class="input-group input-group-lg">
                         <input type="text" name="search" class="form-control" placeholder="Search for pastries..." value="{{ $searchTerm ?? '' }}">
                         <button type="submit" class="btn btn-pastry">
                             <i class="fas fa-search"></i> Search
@@ -68,37 +83,62 @@
             </div>
         </div>
 
-        <!-- Products Section -->
-        <div id="productsContainer">
-            <!-- Filters Section -->
-            <div class="filter-section">
-                <div class="row align-items-end mb-4">
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Price Range</label>
-                        <div class="price-range-container">
-                            <input type="number" name="min_price" class="form-control form-control-sm" placeholder="Min" value="{{ $minPrice ?? '' }}" min="0" step="0.01">
-                            <span>-</span>
-                            <input type="number" name="max_price" class="form-control form-control-sm" placeholder="Max" value="{{ $maxPrice ?? '' }}" min="0" step="0.01">
-                        </div>
+        <!-- Filters Section -->
+        <div class="filter-section">
+            <div class="row align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Price Range</label>
+                    <div class="price-range-container">
+                        <input type="number" name="min_price" class="form-control form-control-sm" placeholder="Min" value="{{ $minPrice ?? '' }}" min="0" step="0.01">
+                        <span>-</span>
+                        <input type="number" name="max_price" class="form-control form-control-sm" placeholder="Max" value="{{ $maxPrice ?? '' }}" min="0" step="0.01">
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Category</label>
-                        <select name="category" class="form-select form-select-sm">
-                            <option value="">All Categories</option>
-                            @foreach($categories as $cat)
-                                <option value="{{ $cat }}" {{ ($category ?? '') === $cat ? 'selected' : '' }}>{{ $cat }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-4 d-flex gap-2">
-                        @if($searchTerm || $minPrice || $maxPrice || $category)
-                            <a href="{{ route('shop.index') }}" class="btn btn-outline-danger btn-sm">Clear All</a>
-                        @endif
-                        <button type="button" id="applyFilters" class="btn btn-pastry btn-sm flex-fill">Apply Filters</button>
-                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Category</label>
+                    <select name="category" class="form-select form-select-sm">
+                        <option value="">All Categories</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat }}" {{ ($category ?? '') === $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="button" id="applyFilters" class="btn btn-pastry btn-sm w-100">Apply Filters</button>
                 </div>
             </div>
             
+            <!-- Active Filters Display -->
+            @if($searchTerm || $minPrice || $maxPrice || $category)
+                <div class="mt-3">
+                    <small class="text-muted fw-bold">Active Filters:</small>
+                    <div class="mt-2">
+                        @if($searchTerm)
+                            <span class="filter-badge">
+                                Search: {{ $searchTerm }}
+                                <span class="remove-filter" data-filter="search">×</span>
+                            </span>
+                        @endif
+                        @if($minPrice || $maxPrice)
+                            <span class="filter-badge">
+                                Price: ₱{{ $minPrice ?? '0' }} - ₱{{ $maxPrice ?? '∞' }}
+                                <span class="remove-filter" data-filter="price">×</span>
+                            </span>
+                        @endif
+                        @if($category)
+                            <span class="filter-badge">
+                                Category: {{ $category }}
+                                <span class="remove-filter" data-filter="category">×</span>
+                            </span>
+                        @endif
+                        <a href="{{ route('shop.index') }}" class="btn btn-outline-secondary btn-sm ms-2">Clear All</a>
+                    </div>
+                </div>
+            @endif
+        </div>
+
+        <!-- Products Section -->
+        <div id="productsContainer">
             @if($products->isEmpty())
                 <div class="text-center py-5">
                     <p class="text-muted">No products found matching your criteria.</p>
@@ -141,11 +181,6 @@
                         </div>
                     @endforeach
                 </div>
-                
-                <!-- Pagination -->
-                <div class="d-flex justify-content-center">
-                    {{ $products->links() }}
-                </div>
             @endif
         </div>
     </div>
@@ -154,9 +189,18 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const loadingOverlay = document.getElementById('loadingOverlay');
     const searchForm = document.getElementById('searchForm');
     const applyFiltersBtn = document.getElementById('applyFilters');
     const removeFilterBtns = document.querySelectorAll('.remove-filter');
+    
+    function showLoading() {
+        loadingOverlay.style.display = 'flex';
+    }
+    
+    function hideLoading() {
+        loadingOverlay.style.display = 'none';
+    }
     
     function buildUrl() {
         const url = new URL(window.location);
@@ -196,6 +240,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function loadProducts() {
+        showLoading();
         const url = buildUrl();
         
         fetch(url, {
@@ -217,50 +262,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Update URL without page reload
             history.pushState({}, '', url);
-            
-            // Re-attach pagination click handlers
-            attachPaginationHandlers();
+            hideLoading();
         })
         .catch(error => {
             console.error('Error loading products:', error);
-        });
-    }
-    
-    function attachPaginationHandlers() {
-        // Attach click handlers to pagination links
-        const paginationLinks = document.querySelectorAll('.pagination a');
-        paginationLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const url = this.href;
-                
-                fetch(url, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'text/html'
-                    }
-                })
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const newProductsContainer = doc.getElementById('productsContainer');
-                    const currentProductsContainer = document.getElementById('productsContainer');
-                    
-                    if (newProductsContainer && currentProductsContainer) {
-                        currentProductsContainer.innerHTML = newProductsContainer.innerHTML;
-                    }
-                    
-                    // Update URL without page reload
-                    history.pushState({}, '', url);
-                    
-                    // Re-attach pagination handlers
-                    attachPaginationHandlers();
-                })
-                .catch(error => {
-                    console.error('Error loading products:', error);
-                });
-            });
+            hideLoading();
         });
     }
     
@@ -303,9 +309,6 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('popstate', function() {
         location.reload();
     });
-    
-    // Initialize pagination handlers on page load
-    attachPaginationHandlers();
 });
 </script>
 @endpush

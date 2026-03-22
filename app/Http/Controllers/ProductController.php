@@ -26,7 +26,7 @@ class ProductController extends Controller
 
     public function create(): View
     {
-        $categories = array_keys(config('categories.product_categories'));
+        $categories = ['bread', 'cakes', 'pastries', 'cookies', 'pies', 'tarts', 'muffins', 'croissants', 'donuts', 'buns'];
         return view('products.create', compact('categories'));
     }
 
@@ -96,7 +96,7 @@ class ProductController extends Controller
 
     public function edit(Product $product): View
     {
-        $categories = array_keys(config('categories.product_categories'));
+        $categories = ['bread', 'cakes', 'pastries', 'cookies', 'pies', 'tarts', 'muffins', 'croissants', 'donuts', 'buns'];
         $product->load(['photos', 'thumbnail']);
         return view('products.edit', compact('product', 'categories'));
     }
@@ -345,11 +345,6 @@ class ProductController extends Controller
                 'message' => 'Failed to empty trash: ' . $e->getMessage()
             ], 500);
         }
-    }
-
-    public function importView(): View
-    {
-        return view('admin.products.import');
     }
 
     public function import(Request $request): JsonResponse
