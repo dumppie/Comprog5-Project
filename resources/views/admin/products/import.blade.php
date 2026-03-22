@@ -19,7 +19,7 @@
                         <p>Upload an Excel file (.xlsx or .xls) with the following columns:</p>
                         <ul>
                             <li><strong>name</strong> - Product name (required)</li>
-                            <li><strong>category</strong> - Product category (optional: electronics, clothing, food, books, toys, sports, home, beauty, automotive, other)</li>
+                            <li><strong>category</strong> - Product category (optional: {{ implode(', ', array_keys(config('categories.product_categories'))) }})</li>
                             <li><strong>description</strong> - Product description (optional)</li>
                             <li><strong>price</strong> - Product price (required, numeric)</li>
                             <li><strong>stock_quantity</strong> - Stock quantity (required, integer)</li>

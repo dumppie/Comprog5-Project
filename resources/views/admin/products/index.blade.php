@@ -71,16 +71,9 @@
             <div class="col-md-3">
                 <select class="form-control border-2" id="categoryFilter" style="border-color: var(--pastry-sand);">
                     <option value="">All Categories</option>
-                    <option value="bread">Bread</option>
-                    <option value="cakes">Cakes</option>
-                    <option value="pastries">Pastries</option>
-                    <option value="cookies">Cookies</option>
-                    <option value="pies">Pies</option>
-                    <option value="tarts">Tarts</option>
-                    <option value="muffins">Muffins</option>
-                    <option value="croissants">Croissants</option>
-                    <option value="donuts">Donuts</option>
-                    <option value="buns">Buns</option>
+                    @foreach(config('categories.product_categories') as $key => $description)
+                        <option value="{{ $key }}">{{ ucfirst($key) }}</option>
+                    @endforeach
                 </select>
             </div>
             <div class="col-md-3">

@@ -29,7 +29,7 @@ class ShopController extends Controller
                     if ($category) {
                         $products = $products->where('category', $category);
                     }
-                    $products = $products->where('status', 'active')->get();
+                    $products = $products->where('status', 'active')->paginate(12);
                 } else {
                     $products = Product::whereNull('deleted_at')
                         ->active()
@@ -37,7 +37,7 @@ class ShopController extends Controller
                         ->priceRange($minPrice, $maxPrice)
                         ->category($category)
                         ->orderBy('name')
-                        ->get();
+                        ->paginate(12);
                 }
             } catch (\Exception $e) {
                 // Fallback to basic search if Scout fails
@@ -47,14 +47,14 @@ class ShopController extends Controller
                     ->priceRange($minPrice, $maxPrice)
                     ->category($category)
                     ->orderBy('name')
-                    ->get();
+                    ->paginate(12);
             }
         } else {
             // Show all active products when no filters
             $products = Product::whereNull('deleted_at')
                 ->active()
                 ->orderBy('name')
-                ->get();
+                ->paginate(12);
         }
 
         // Get unique categories for filter dropdown

@@ -52,6 +52,17 @@
         <p><strong>Payment:</strong> {{ $order->paymentMethod->name }}</p>
     </div>
 
+    <div style="margin-top: 2rem; padding: 1rem; background: #e8f5e8; border-radius: 6px; border-left: 4px solid #28a745;">
+        <h3 style="margin-top: 0; color: #155724;">📎 Your Receipt</h3>
+        <p>Your order receipt has been attached as a PDF file for your records. You can also download it anytime from your order history.</p>
+        <p><strong>File:</strong> receipt-{{ $order->transaction_id }}.pdf</p>
+        <p style="margin: 0;">
+            <a href="{{ route('orders.receipt', $order) }}" style="display: inline-block; padding: 8px 16px; background: #28a745; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">
+                📥 Download Receipt
+            </a>
+        </p>
+    </div>
+
     <p style="margin-top: 2rem;">Thank you for your order.</p>
 </body>
 </html>

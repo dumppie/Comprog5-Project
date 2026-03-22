@@ -37,7 +37,7 @@ class DashboardController extends Controller
             ->get();
 
         // Get recent orders
-        $recentOrders = Order::with(['user', 'items.product'])
+        $recentOrders = Order::with(['user', 'orderItems.product'])
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();

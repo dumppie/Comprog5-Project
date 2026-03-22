@@ -6,14 +6,26 @@ use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\SkipsOnError;
+use Maatwebsite\Excel\Concerns\WithStartRow;
 use App\Models\Product;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 
-class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnError
+class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnError, WithStartRow
 {
     private $importedCount = 0;
     private $errors = [];
+    private $currentRow = 2; // Start from row 2 (after headers)
+
+    public function startRow(): int
+    {
+        return 2;
+    }
+
+    public function getCurrentRow(): int
+    {
+        return $this->currentRow;
+    }
 
     public function model(array $row): ?Product
     {
@@ -28,24 +40,29 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
             ]);
 
             $this->importedCount++;
+            $this->currentRow++;
             return $product;
 
         } catch (\Exception $e) {
             $this->errors[] = [
-                'row' => $this->getCurrentRow(),
+                'row' => $this->currentRow,
                 'data' => $row,
                 'error' => $e->getMessage(),
                 'field' => 'general'
             ];
+            $this->currentRow++;
             return null;
         }
     }
 
     public function rules(): array
     {
+        $categories = array_keys(config('categories.product_categories'));
+        $categoryString = implode(',', $categories);
+        
         return [
             'name' => 'required|string|max:255',
-            'category' => 'nullable|string|in:bread,cakes,pastries,cookies,pies,tarts,muffins,croissants,donuts,buns',
+            'category' => 'nullable|string|in:' . $categoryString,
             'description' => 'nullable|string|max:2000',
             'price' => 'required|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0'
@@ -67,11 +84,12 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
     public function onError(\Throwable $e): void
     {
         $this->errors[] = [
-            'row' => $this->getCurrentRow(),
+            'row' => $this->currentRow,
             'data' => $e->getTraceAsString(),
             'error' => $e->getMessage(),
             'field' => 'system_error'
         ];
+        $this->currentRow++;
     }
 
     private function parsePrice($value): float
