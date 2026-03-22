@@ -5,33 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Review;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Http\Requests\ReviewRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 
 class ReviewController extends Controller
 {
-    public function store(Request $request): RedirectResponse
+    public function store(ReviewRequest $request): RedirectResponse
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'nullable|string|max:1000',
-        ]);
-
         $user = $request->user();
-        $product = Product::findOrFail($request->product_id);
-
-        // FR9.1: Only customers who have purchased can post reviews
-        if (!$user->hasPurchasedProduct($request->product_id)) {
-            abort(403, 'You can only review products you have purchased.');
-        }
-
-        // Check if user already reviewed this product
-        if ($user->hasReviewedProduct($request->product_id)) {
-            return redirect()->back()
-                ->with('error', 'You have already reviewed this product.');
-        }
 
         Review::create([
             'product_id' => $request->product_id,

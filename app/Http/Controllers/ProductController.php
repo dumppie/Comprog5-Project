@@ -83,8 +83,15 @@ class ProductController extends Controller
 
     public function show(Product $product): View
     {
-        $product->load(['photos', 'thumbnail']);
-        return view('products.show', compact('product'));
+        $product->load(['photos', 'thumbnail', 'reviews.user']);
+
+        // If this is an admin route or the user is admin, show admin product view
+        if (request()->is('admin/*') || (auth()->check() && auth()->user()->isAdmin())) {
+            return view('products.show', compact('product'));
+        }
+
+        // Public customer-facing product detail
+        return view('shop.show', compact('product'));
     }
 
     public function edit(Product $product): View

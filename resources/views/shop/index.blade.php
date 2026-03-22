@@ -110,14 +110,16 @@
                         <div class="col-sm-6 col-md-4 col-lg-3">
                             <div class="card card-pastry h-100">
                                 @if($product->thumbnail_photo)
-                                    <img src="{{ asset('storage/' . $product->thumbnail_photo) }}" class="card-img-top" alt="{{ $product->name }}" style="height: 180px; object-fit: cover;">
+                                    <a href="{{ route('products.show', $product) }}" class="d-block">
+                                        <img src="{{ asset('storage/' . $product->thumbnail_photo) }}" class="card-img-top" alt="{{ $product->name }}" style="height: 180px; object-fit: cover;">
+                                    </a>
                                 @else
-                                    <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 180px; color: var(--pastry-caramel);">
+                                    <a href="{{ route('products.show', $product) }}" class="d-block card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 180px; color: var(--pastry-caramel); text-decoration: none;">
                                         <i class="fas fa-bread-slice fa-3x"></i>
-                                    </div>
+                                    </a>
                                 @endif
                                 <div class="card-body d-flex flex-column">
-                                    <h5 class="card-title font-serif" style="color: var(--pastry-brown);">{{ $product->name }}</h5>
+                                    <h5 class="card-title font-serif" style="color: var(--pastry-brown);"><a href="{{ route('products.show', $product) }}" class="text-decoration-none text-reset">{{ $product->name }}</a></h5>
                                     <p class="card-text text-muted small flex-grow-1">{{ Str::limit($product->description, 60) }}</p>
                                     <p class="mb-2"><strong>{{ $product->formatted_price ?? '₱' . number_format($product->price, 2) }}</strong></p>
                                     @auth
