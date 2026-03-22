@@ -12,7 +12,7 @@
                     <div class="col-lg-8">
                         <form action="{{ route('checkout.store') }}" method="POST">
                             @csrf
-                            <h5 class="mb-3" style="color: var(--pastry-brown);">Shipping details (FR5.2)</h5>
+                            <h5 class="mb-3" style="color: var(--pastry-brown);">Shipping details</h5>
                             <div class="mb-3">
                                 <label for="shipping_name" class="form-label">Name *</label>
                                 <input type="text" id="shipping_name" name="shipping_name" class="form-control" value="{{ old('shipping_name', $user->full_name) }}" required>
@@ -29,7 +29,7 @@
                                 @error('shipping_contact') <div class="text-danger small">{{ $message }}</div> @enderror
                             </div>
 
-                            <h5 class="mb-3 mt-4" style="color: var(--pastry-brown);">Payment method (FR5.3)</h5>
+                            <h5 class="mb-3 mt-4" style="color: var(--pastry-brown);">Payment method</h5>
                             <div class="mb-4">
                                 @foreach($paymentMethods as $pm)
                                     <div class="form-check">

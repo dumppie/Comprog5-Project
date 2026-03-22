@@ -20,7 +20,7 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
         try {
             $product = Product::create([
                 'name' => $row['name'] ?? null,
-                'category' => $row['category'] ?? 'other',
+                'category' => $row['category'] ?? 'bread',
                 'description' => $row['description'] ?? null,
                 'price' => $this->parsePrice($row['price'] ?? 0),
                 'stock_quantity' => $this->parseInteger($row['stock_quantity'] ?? 0),
@@ -45,7 +45,7 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
     {
         return [
             'name' => 'required|string|max:255',
-            'category' => 'nullable|string|in:electronics,clothing,food,books,toys,sports,home,beauty,automotive,other',
+            'category' => 'nullable|string|in:bread,cakes,pastries,cookies,pies,tarts,muffins,croissants,donuts,buns',
             'description' => 'nullable|string|max:2000',
             'price' => 'required|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0'

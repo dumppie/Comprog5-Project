@@ -27,8 +27,13 @@ class EmailVerificationController extends Controller
             return response()->json(['message' => 'User not authenticated'], 401);
         }
 
+        // Check if user is already verified
         if ($this->emailVerificationService->isEmailVerified($user)) {
-            return response()->json(['message' => 'Email already verified'], 200);
+            return response()->json([
+                'message' => 'Your email is already verified!',
+                'verified' => true,
+                'redirect' => route('profile.edit')
+            ], 200);
         }
 
         $sent = $this->emailVerificationService->sendVerificationEmail($user);
@@ -51,8 +56,15 @@ class EmailVerificationController extends Controller
         $verified = $this->emailVerificationService->verifyEmail($token);
 
         if ($verified) {
+            // Check if user is logged in (email update scenario)
+            if (Auth::check()) {
+                return redirect()->route('profile.edit')
+                    ->with('success', 'Your email has been successfully verified!');
+            }
+            
+            // For new registrations, redirect to login
             return redirect()->route('verification.success')
-                ->with('success', 'Your email has been successfully verified!');
+                ->with('success', 'Your email has been successfully verified! You can now log in.');
         }
 
         return redirect()->route('verification.failed')
@@ -100,23 +112,5 @@ class EmailVerificationController extends Controller
     public function failed()
     {
         return view('auth.verification-failed');
-    }
-
-    /**
-     * Check verification status
-     */
-    public function status(Request $request): JsonResponse
-    {
-        $user = Auth::user();
-
-        if (!$user) {
-            return response()->json(['message' => 'User not authenticated'], 401);
-        }
-
-        return response()->json([
-            'verified' => $this->emailVerificationService->isEmailVerified($user),
-            'email' => $user->email,
-            'verified_at' => $user->email_verified_at
-        ]);
     }
 }

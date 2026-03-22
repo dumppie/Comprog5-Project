@@ -23,7 +23,7 @@ class ProductRequest extends FormRequest
     {
         $rules = [
             'name' => 'required|string|max:255',
-            'category' => 'required|string|in:electronics,clothing,food,books,toys,sports,home,beauty,automotive,other',
+            'category' => 'required|string|in:bread,cakes,pastries,cookies,pies,tarts,muffins,croissants,donuts,buns',
             'description' => 'nullable|string|max:2000',
             'price' => 'required|numeric|min:0|max:999999.99',
             'stock_quantity' => 'required|integer|min:0|max:999999',
@@ -38,7 +38,7 @@ class ProductRequest extends FormRequest
         // For update requests, make fields optional if not provided
         if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
             $rules['name'] = 'sometimes|string|max:255';
-            $rules['category'] = 'sometimes|string|in:electronics,clothing,food,books,toys,sports,home,beauty,automotive,other';
+            $rules['category'] = 'sometimes|string|in:bread,cakes,pastries,cookies,pies,tarts,muffins,croissants,donuts,buns';
             $rules['description'] = 'sometimes|nullable|string|max:2000';
             $rules['price'] = 'sometimes|numeric|min:0|max:999999.99';
             $rules['stock_quantity'] = 'sometimes|integer|min:0|max:999999';

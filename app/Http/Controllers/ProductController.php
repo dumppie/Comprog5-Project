@@ -18,7 +18,6 @@ class ProductController extends Controller
     public function index(): View
     {
         $products = Product::with(['photos', 'thumbnail'])
-            ->withTrashed()
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -27,11 +26,11 @@ class ProductController extends Controller
 
     public function create(): View
     {
-        $categories = ['electronics', 'clothing', 'food', 'books', 'toys', 'sports', 'home', 'beauty', 'automotive', 'other'];
+        $categories = ['bread', 'cakes', 'pastries', 'cookies', 'pies', 'tarts', 'muffins', 'croissants', 'donuts', 'buns'];
         return view('products.create', compact('categories'));
     }
 
-    public function store(ProductRequest $request): JsonResponse
+    public function store(ProductRequest $request)
     {
         try {
             DB::beginTransaction();
@@ -42,7 +41,7 @@ class ProductController extends Controller
                 'description' => $request->description,
                 'price' => $request->price,
                 'stock_quantity' => $request->stock_quantity,
-                'status' => 'active'
+                'status' => $request->status ?? 'active'
             ]);
 
             // Handle thumbnail upload
@@ -69,18 +68,16 @@ class ProductController extends Controller
 
             DB::commit();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Product created successfully',
-                'product' => $product->load(['photos', 'thumbnail'])
-            ]);
+            return redirect()
+                ->route('admin.products.index')
+                ->with('success', 'Product "' . $product->name . '" has been created successfully!');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create product: ' . $e->getMessage()
-            ], 500);
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Failed to create product: ' . $e->getMessage());
         }
     }
 
@@ -92,7 +89,7 @@ class ProductController extends Controller
 
     public function edit(Product $product): View
     {
-        $categories = ['electronics', 'clothing', 'food', 'books', 'toys', 'sports', 'home', 'beauty', 'automotive', 'other'];
+        $categories = ['bread', 'cakes', 'pastries', 'cookies', 'pies', 'tarts', 'muffins', 'croissants', 'donuts', 'buns'];
         $product->load(['photos', 'thumbnail']);
         return view('products.edit', compact('product', 'categories'));
     }
@@ -227,7 +224,120 @@ class ProductController extends Controller
             ->orderBy('deleted_at', 'desc')
             ->get();
 
-        return view('products.trash_test', compact('trashedProducts'));
+        return view('admin.products.trash_simple', compact('trashedProducts'));
+    }
+
+    public function bulkRestore(Request $request): JsonResponse
+    {
+        try {
+            DB::beginTransaction();
+            
+            $productIds = $request->product_ids;
+            $restoredCount = 0;
+            
+            foreach ($productIds as $productId) {
+                $product = Product::withTrashed()->find($productId);
+                if ($product && $product->trashed()) {
+                    $product->restore();
+                    $restoredCount++;
+                }
+            }
+            
+            DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully restored {$restoredCount} products"
+            ]);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to restore products: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function bulkForceDelete(Request $request): JsonResponse
+    {
+        try {
+            DB::beginTransaction();
+            
+            $productIds = $request->product_ids;
+            $deletedCount = 0;
+            
+            foreach ($productIds as $productId) {
+                $product = Product::withTrashed()->find($productId);
+                if ($product && $product->trashed()) {
+                    // Delete associated photos
+                    if ($product->thumbnail_photo) {
+                        Storage::disk('public')->delete($product->thumbnail_photo);
+                    }
+                    
+                    foreach ($product->photos as $photo) {
+                        Storage::disk('public')->delete($photo->photo_path);
+                        $photo->delete();
+                    }
+                    
+                    $product->forceDelete();
+                    $deletedCount++;
+                }
+            }
+            
+            DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully permanently deleted {$deletedCount} products"
+            ]);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete products: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function emptyTrash(): JsonResponse
+    {
+        try {
+            DB::beginTransaction();
+            
+            $trashedProducts = Product::onlyTrashed()->get();
+            $deletedCount = 0;
+            
+            foreach ($trashedProducts as $product) {
+                // Delete associated photos
+                if ($product->thumbnail_photo) {
+                    Storage::disk('public')->delete($product->thumbnail_photo);
+                }
+                
+                foreach ($product->photos as $photo) {
+                    Storage::disk('public')->delete($photo->photo_path);
+                    $photo->delete();
+                }
+                
+                $product->forceDelete();
+                $deletedCount++;
+            }
+            
+            DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully emptied trash. {$deletedCount} products permanently deleted."
+            ]);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to empty trash: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function import(Request $request): JsonResponse

@@ -6,11 +6,11 @@
         <div class="card card-pastry">
             <div class="card-body p-4">
                 <p class="text-uppercase mb-1" style="letter-spacing: 0.15em; color: var(--pastry-caramel); font-size: 0.85rem;">Admin</p>
-                <h2 class="font-serif mb-4" style="color: var(--pastry-brown);">Order management (FR5.7)</h2>
+                <h2 class="font-serif mb-4" style="color: var(--pastry-brown);">Order management</h2>
 
                 @if($lowStockProducts->isNotEmpty() || $outOfStockProducts->isNotEmpty())
                     <div class="alert alert-warning mb-4" role="alert">
-                        <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>FR6.2: Inventory alert</h6>
+                        <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Inventory alert</h6>
                         @if($outOfStockProducts->isNotEmpty())
                             <p class="mb-1"><strong>Out of stock:</strong>
                                 @foreach($outOfStockProducts as $p)

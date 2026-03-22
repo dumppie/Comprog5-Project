@@ -238,10 +238,103 @@
 @endsection
 
 @push('scripts')
+<!-- Import Modal -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Import Products</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-info-circle"></i> Import Instructions</h6>
+                    <small>Upload an Excel file (.xlsx or .xls) with columns: name, category, description, price, stock_quantity</small>
+                </div>
+                <form id="importForm" action="{{ route('admin.products.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="form-group mb-3">
+                        <label for="excel_file" class="form-label">Select Excel File</label>
+                        <input type="file" class="form-control" id="excel_file" name="excel_file" 
+                               accept=".xlsx,.xls" required>
+                        @error('excel_file')
+                            <div class="text-danger">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="importForm" class="btn btn-primary">
+                    <i class="fas fa-upload"></i> Import
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     function showImportModal() {
-        // This would typically open a modal, for now redirect to import
-        window.location.href = '{{ route('admin.products.import') }}';
+        $('#importModal').modal('show');
     }
+
+    $(document).ready(function() {
+        $('#importForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            var formData = new FormData(this);
+            var submitBtn = $('button[form="importForm"]');
+            var originalText = submitBtn.html();
+            
+            submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Importing...');
+            
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        $('#importModal').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Import Successful!',
+                            html: `Successfully imported ${response.imported} products.`,
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload(); // Reload to show updated stats
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Import Failed',
+                            text: response.message,
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    var errorMessage = 'An error occurred during import.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Import Failed',
+                        text: errorMessage,
+                        confirmButtonText: 'OK'
+                    });
+                },
+                complete: function() {
+                    submitBtn.prop('disabled', false).html(originalText);
+                    $('#importForm')[0].reset(); // Reset form
+                }
+            });
+        });
+    });
 </script>
 @endpush

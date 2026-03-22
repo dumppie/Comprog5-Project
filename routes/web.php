@@ -26,6 +26,9 @@ use Illuminate\Http\Request;
 Route::get('/', HomeController::class)->name('home');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/register', function () {
+    if (auth()->check()) {
+        return redirect()->route('home');
+    }
     return view('auth.register');
 })->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
@@ -40,7 +43,6 @@ Route::get('/email/verify', function () {
 Route::get('/email/verify/{token}', [EmailVerificationController::class, 'verify'])->name('verification.verify')->where('token', '[a-zA-Z0-9]+');
 Route::post('/email/verify/send', [EmailVerificationController::class, 'send'])->middleware('auth')->name('verification.send');
 Route::post('/email/verify/resend', [EmailVerificationController::class, 'resend'])->middleware('auth')->name('verification.resend');
-Route::get('/email/verify/status', [EmailVerificationController::class, 'status'])->middleware('auth')->name('verification.status');
 Route::get('/verification/success', [EmailVerificationController::class, 'success'])->name('verification.success');
 Route::get('/verification/failed', [EmailVerificationController::class, 'failed'])->name('verification.failed');
 
@@ -80,15 +82,18 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.'
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+    Route::get('/products/trash', [ProductController::class, 'trash'])->name('products.trash');
     Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
     Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
     Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
     Route::post('/products/{product}/restore', [ProductController::class, 'restore'])->name('products.restore');
     Route::delete('/products/{product}/force', [ProductController::class, 'forceDelete'])->name('products.force-delete');
-    Route::get('/products/trash', [ProductController::class, 'trash'])->name('products.trash');
     Route::post('/products/import', [ProductController::class, 'import'])->name('products.import');
     Route::post('/products/bulk-delete', [ProductController::class, 'bulkDelete'])->name('products.bulk-delete');
+    Route::post('/products/bulk-restore', [ProductController::class, 'bulkRestore'])->name('products.bulk-restore');
+    Route::delete('/products/bulk-force-delete', [ProductController::class, 'bulkForceDelete'])->name('products.bulk-force-delete');
+    Route::delete('/products/empty-trash', [ProductController::class, 'emptyTrash'])->name('products.empty-trash');
     Route::get('/products/error-report/download', [ProductController::class, 'downloadErrorReport'])->name('products.error-report.download');
 
     // Reviews Management (FR9.3, FR9.4)

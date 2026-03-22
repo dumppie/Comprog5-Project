@@ -140,6 +140,11 @@ class Product extends Model
         return $this->stock_quantity > 0 ? 'In Stock' : 'Out of Stock';
     }
 
+    public function getFormattedCategoryAttribute()
+    {
+        return ucfirst($this->category);
+    }
+
     public function getIsActiveAttribute()
     {
         return $this->status === 'active';

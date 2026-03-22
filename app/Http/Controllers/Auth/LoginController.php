@@ -11,8 +11,13 @@ use Illuminate\View\View;
 
 class LoginController extends Controller
 {
-    public function showLoginForm(): View
+    public function showLoginForm(): View|RedirectResponse
     {
+        // Redirect logged-in users to home page
+        if (Auth::check()) {
+            return redirect()->route('home');
+        }
+        
         return view('auth.login');
     }
 

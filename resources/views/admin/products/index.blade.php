@@ -23,35 +23,68 @@
 @endsection
 
 @section('content')
-<div class="card">
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show border-0" style="background-color: #D4EDDA; border-left: 4px solid #28A745 !important;">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-check-circle me-2"></i>
+            <div>{{ session('success') }}</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show border-0" style="background-color: #F8D7DA; border-left: 4px solid #DC3545 !important;">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <div>{{ session('error') }}</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+@endif
+
+<div class="card bg-white border-2 shadow-lg" style="border-color: var(--pastry-sand);">
+    <div class="card-header bg-white border-0" style="border-bottom: 2px solid var(--pastry-sand) !important;">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0" style="color: var(--pastry-brown);">
+                <i class="fas fa-box me-2"></i>Products Inventory ({{ $products->count() }})
+            </h5>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-pastry" onclick="bulkDelete()" id="bulkDeleteBtn" style="display: none;">
+                    <i class="fas fa-trash me-2"></i>Delete Selected
+                </button>
+            </div>
+        </div>
+    </div>
     <div class="card-body">
         <!-- Search and Filter -->
-        <div class="row mb-3">
+        <div class="row mb-4">
             <div class="col-md-6">
                 <div class="input-group">
-                    <span class="input-group-text">
+                    <span class="input-group-text" style="border-color: var(--pastry-sand); background-color: var(--pastry-cream);">
                         <i class="fas fa-search"></i>
                     </span>
-                    <input type="text" class="form-control" id="searchInput" placeholder="Search products...">
+                    <input type="text" class="form-control border-2" id="searchInput" 
+                           placeholder="Search products..." style="border-color: var(--pastry-sand);">
                 </div>
             </div>
             <div class="col-md-3">
-                <select class="form-select" id="categoryFilter">
+                <select class="form-control border-2" id="categoryFilter" style="border-color: var(--pastry-sand);">
                     <option value="">All Categories</option>
-                    <option value="electronics">Electronics</option>
-                    <option value="clothing">Clothing</option>
-                    <option value="food">Food</option>
-                    <option value="books">Books</option>
-                    <option value="toys">Toys</option>
-                    <option value="sports">Sports</option>
-                    <option value="home">Home</option>
-                    <option value="beauty">Beauty</option>
-                    <option value="automotive">Automotive</option>
-                    <option value="other">Other</option>
+                    <option value="bread">Bread</option>
+                    <option value="cakes">Cakes</option>
+                    <option value="pastries">Pastries</option>
+                    <option value="cookies">Cookies</option>
+                    <option value="pies">Pies</option>
+                    <option value="tarts">Tarts</option>
+                    <option value="muffins">Muffins</option>
+                    <option value="croissants">Croissants</option>
+                    <option value="donuts">Donuts</option>
+                    <option value="buns">Buns</option>
                 </select>
             </div>
             <div class="col-md-3">
-                <select class="form-select" id="statusFilter">
+                <select class="form-control border-2" id="statusFilter" style="border-color: var(--pastry-sand);">
                     <option value="">All Status</option>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
@@ -62,9 +95,9 @@
         <!-- Products Table -->
         <div class="table-responsive">
             <table class="table table-hover" id="productsTable">
-                <thead class="table-light">
-                    <tr>
-                        <th>
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--pastry-sand);">
+                        <th width="50">
                             <input type="checkbox" class="form-check-input" id="selectAll">
                         </th>
                         <th>Product</th>
@@ -74,92 +107,132 @@
                         <th>Status</th>
                         <th>Photos</th>
                         <th>Created</th>
-                        <th>Actions</th>
+                        <th width="150">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($products as $product)
-                        <tr>
-                            <td>
-                                <input type="checkbox" class="form-check-input product-checkbox" value="{{ $product->id }}">
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    @if($product->thumbnail)
-                                        <img src="{{ asset('storage/' . $product->thumbnail->photo_path) }}" 
-                                             alt="{{ $product->name }}" 
-                                             class="rounded me-3" 
-                                             style="width: 50px; height: 50px; object-fit: cover;">
-                                    @else
-                                        <div class="bg-light rounded me-3 d-flex align-items-center justify-content-center" 
-                                             style="width: 50px; height: 50px;">
-                                            <i class="fas fa-image text-muted"></i>
+                    @if($products->count() > 0)
+                        @foreach($products as $product)
+                            <tr class="product-row" data-category="{{ $product->category }}" data-status="{{ $product->status }}">
+                                <td>
+                                    <input type="checkbox" class="form-check-input product-checkbox" value="{{ $product->id }}">
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        @if($product->thumbnail)
+                                            <img src="{{ asset('storage/' . $product->thumbnail->photo_path) }}" 
+                                                 alt="{{ $product->name }}" 
+                                                 class="me-3" 
+                                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 2px solid var(--pastry-sand);">
+                                        @else
+                                            <div class="me-3 d-flex align-items-center justify-content-center" 
+                                                 style="width: 50px; height: 50px; background-color: var(--pastry-sand); border-radius: 8px;">
+                                                <i class="fas fa-image" style="color: var(--pastry-caramel);"></i>
+                                            </div>
+                                        @endif
+                                        <div>
+                                            <div class="fw-semibold" style="color: var(--pastry-brown);">{{ $product->name }}</div>
+                                            @if($product->description)
+                                                <small class="text-muted">{{ Str::limit($product->description, 60) }}</small>
+                                            @endif
                                         </div>
-                                    @endif
-                                    <div>
-                                        <div class="fw-bold">{{ $product->name }}</div>
-                                        <small class="text-muted">{{ Str::limit($product->description, 60) }}</small>
                                     </div>
-                                </div>
-                            </td>
-                            <td><span class="badge" style="background-color: var(--pastry-sand); color: var(--pastry-brown);">{{ $product->category }}</span></td>
-                            <td class="fw-bold">{{ $product->formatted_price }}</td>
-                            <td>
-                                <span class="badge {{ $product->stock_quantity > 10 ? 'bg-success' : ($product->stock_quantity > 0 ? 'bg-warning' : 'bg-danger') }}">
-                                    {{ $product->stock_quantity }}
-                                </span>
-                            </td>
-                            <td>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input status-toggle" type="checkbox" 
-                                           data-product-id="{{ $product->id }}" 
-                                           {{ $product->status === 'active' ? 'checked' : '' }}>
-                                    <label class="form-check-label"></label>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="badge bg-primary">{{ $product->photos->count() }}</span>
-                            </td>
-                            <td>
-                                <small>{{ $product->created_at->format('M d, Y') }}</small>
-                            </td>
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <a href="{{ route('admin.products.show', $product->id) }}" 
-                                       class="btn btn-sm btn-outline-primary" 
-                                       title="View">
-                                        <i class="fas fa-eye"></i>
+                                </td>
+                                <td>
+                                    <span class="badge" style="background-color: var(--pastry-sand); color: var(--pastry-brown);">
+                                        {{ ucfirst($product->category) }}
+                                    </span>
+                                </td>
+                                <td class="fw-bold" style="color: var(--pastry-brown);">{{ $product->formatted_price }}</td>
+                                <td>
+                                    <span class="badge {{ $product->stock_quantity > 10 ? 'bg-success' : ($product->stock_quantity > 0 ? 'bg-warning' : 'bg-danger') }}">
+                                        {{ $product->stock_quantity }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input status-toggle" type="checkbox" 
+                                               data-product-id="{{ $product->id }}" 
+                                               {{ $product->status === 'active' ? 'checked' : '' }}
+                                               style="accent-color: var(--pastry-caramel);">
+                                        <label class="form-check-label"></label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">{{ $product->photos->count() }}</span>
+                                </td>
+                                <td>
+                                    <small>{{ $product->created_at->format('M d, Y') }}</small>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ route('admin.products.show', $product->id) }}" 
+                                           class="btn btn-sm btn-outline-pastry" 
+                                           title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('admin.products.edit', $product->id) }}" 
+                                           class="btn btn-sm btn-outline-pastry" 
+                                           title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        @if($product->deleted_at)
+                                            <button class="btn btn-sm btn-outline-success" 
+                                                    onclick="restoreProduct({{ $product->id }})" 
+                                                    title="Restore">
+                                                <i class="fas fa-undo"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" 
+                                                    onclick="forceDeleteProduct({{ $product->id }})" 
+                                                    title="Permanently Delete">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        @else
+                                            <button class="btn btn-sm btn-outline-danger" 
+                                                    onclick="deleteProduct({{ $product->id }})" 
+                                                    title="Move to Trash">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td colspan="9">
+                                <div class="text-center py-5">
+                                    <div style="color: var(--pastry-caramel); opacity: 0.5; font-size: 4rem;">
+                                        <i class="fas fa-box-open"></i>
+                                    </div>
+                                    <h4 class="mt-3" style="color: var(--pastry-brown);">No Products Found</h4>
+                                    <p class="text-muted">Start by adding your first product to the inventory.</p>
+                                    <a href="{{ route('admin.products.create') }}" class="btn btn-pastry mt-3">
+                                        <i class="fas fa-plus me-2"></i>Add Your First Product
                                     </a>
-                                    <a href="{{ route('admin.products.edit', $product->id) }}" 
-                                       class="btn btn-sm btn-outline-warning" 
-                                       title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    @if($product->deleted_at)
-                                        <button class="btn btn-sm btn-outline-success" 
-                                                onclick="restoreProduct({{ $product->id }})" 
-                                                title="Restore">
-                                            <i class="fas fa-undo"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-danger" 
-                                                onclick="forceDeleteProduct({{ $product->id }})" 
-                                                title="Permanently Delete">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    @else
-                                        <button class="btn btn-sm btn-outline-danger" 
-                                                onclick="deleteProduct({{ $product->id }})" 
-                                                title="Move to Trash">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    @endif
                                 </div>
                             </td>
                         </tr>
-                    @endforeach
+                    @endif
                 </tbody>
             </table>
         </div>
+
+        <!-- Bulk Actions Footer -->
+        @if($products->count() > 0)
+            <div class="mt-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <button class="btn btn-outline-pastry" onclick="bulkDelete()" id="bulkDeleteBtn" style="display: none;">
+                            <i class="fas fa-trash me-2"></i>Delete Selected
+                        </button>
+                    </div>
+                    <small class="text-muted">
+                        <span id="selectedCount">0</span> products selected
+                    </small>
+                </div>
+            </div>
+        @endif
     </div>
 </div>
 
