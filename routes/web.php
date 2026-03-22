@@ -25,6 +25,8 @@ use Illuminate\Http\Request;
 // Guest
 Route::get('/', HomeController::class)->name('home');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
+// Public product detail for customers
+Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/register', function () {
     if (auth()->check()) {
         return redirect()->route('home');
